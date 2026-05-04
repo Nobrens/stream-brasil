@@ -3,57 +3,69 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Stream Brasil - Lives em Tempo Real</title>
+    <title>Stream Brasil - Multi Stream BR</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="site-header">
       <a class="brand" href="#home" aria-label="Stream Brasil">
-        <span class="brand-mark">SB</span>
-        <span>Stream Brasil</span>
+        <span class="brand-mark" id="brandMark">SB</span>
+        <span id="brandName">Stream Brasil</span>
       </a>
       <nav class="nav-links" aria-label="Navegacao principal">
-        <a href="#streamers">Streamers</a>
         <a href="#live">Live</a>
-        <a href="#stats">Seguidores</a>
-        <a href="#api">Publicar</a>
+        <a href="#streamers">Canais</a>
+        <a href="#multi">Multi</a>
+        <a href="#emotes">Emotes</a>
+        <a href="#money">Monetizar</a>
       </nav>
-      <button class="header-button" id="openSettingsButton" type="button">Publicar site</button>
+      <a class="header-button" href="#multi">Abrir multi stream</a>
     </header>
 
     <main>
       <section class="hero" id="home">
-        <div class="hero-bg" aria-hidden="true"></div>
-        <div class="hero-content">
-          <p class="eyebrow">Painel brasileiro de lives</p>
-          <h1>Streamers BR ao vivo</h1>
-          <p>
-            Assista transmissao real, acompanhe chat oficial da Twitch e veja dados de viewers, categoria e seguidores pelo backend do site.
+        <div class="hero-copy">
+          <p class="eyebrow">Hub brasileiro de lives</p>
+          <h1 id="heroTitle">Multi Stream BR</h1>
+          <p id="heroSubtitle">
+            Assista streamers brasileiros com player real, multi chat, favoritos e emotes BTTV em uma experiencia moderna.
           </p>
           <div class="hero-actions">
-            <a class="primary-link" href="#live">Abrir live</a>
-            <a class="secondary-link" href="#streamers">Escolher streamer</a>
+            <a class="primary-link" href="#live">Assistir agora</a>
+            <a class="secondary-link" href="#streamers">Adicionar streamer</a>
           </div>
         </div>
-        <aside class="hero-card">
-          <span>Canal selecionado</span>
-          <strong id="heroChannel">Gaules</strong>
-          <small id="heroStatus">Player e chat reais via Twitch</small>
+
+        <aside class="command-panel" aria-label="Resumo do painel">
+          <div class="command-top">
+            <span>Ao vivo agora</span>
+            <strong id="heroStatus">Conectando...</strong>
+          </div>
+          <div class="command-grid">
+            <div>
+              <span>Canal</span>
+              <strong id="heroChannel">Gaules</strong>
+            </div>
+            <div>
+              <span>Multi</span>
+              <strong id="multiCountLabel">4</strong>
+            </div>
+            <div>
+              <span>Favoritos</span>
+              <strong id="favoriteCountLabel">0</strong>
+            </div>
+            <div>
+              <span>Emotes</span>
+              <strong id="emoteCountLabel">0</strong>
+            </div>
+          </div>
         </aside>
       </section>
 
-      <section class="streamers-section" id="streamers">
-        <div class="section-heading">
-          <p class="eyebrow">Lineup nacional</p>
-          <h2>Streamers brasileiros</h2>
-        </div>
-        <div class="streamer-grid" id="streamerGrid"></div>
-      </section>
-
       <section class="live-section" id="live">
-        <div class="live-toolbar">
+        <div class="section-heading">
           <div>
-            <p class="eyebrow">Live real</p>
+            <p class="eyebrow">Live principal</p>
             <h2 id="liveTitle">Gaules na Twitch</h2>
           </div>
           <form class="channel-form" id="channelForm">
@@ -62,68 +74,151 @@
           </form>
         </div>
 
-        <div class="embed-grid">
-          <section class="player-panel" aria-label="Player da Twitch">
-            <div class="embed-shell" id="playerShell">
-              <iframe
-                id="playerFrame"
-                title="Player da Twitch"
-                allowfullscreen>
-              </iframe>
-            </div>
+        <div class="watch-grid">
+          <section class="watch-player" aria-label="Player da Twitch">
+            <iframe id="playerFrame" title="Player da Twitch" allowfullscreen></iframe>
           </section>
 
-          <aside class="chat-panel" aria-label="Chat da Twitch">
-            <iframe
-              id="chatFrame"
-              title="Chat da Twitch"
-              sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals">
-            </iframe>
+          <aside class="watch-side">
+            <div class="stats-stack" id="stats">
+              <article class="metric-card">
+                <span>Status</span>
+                <strong id="statusMetric">Embed</strong>
+                <small id="statusDetail">Player oficial carregado</small>
+              </article>
+              <article class="metric-card">
+                <span>Viewers</span>
+                <strong id="viewersMetric">API</strong>
+                <small id="viewersDetail">Backend busca automaticamente</small>
+              </article>
+              <article class="metric-card">
+                <span>Seguidores</span>
+                <strong id="followersMetric">API</strong>
+                <small id="followersDetail">Backend busca automaticamente</small>
+              </article>
+              <article class="metric-card">
+                <span>Categoria</span>
+                <strong id="gameMetric">Twitch</strong>
+                <small id="gameDetail">Dados oficiais da live</small>
+              </article>
+            </div>
+
+            <section class="chat-panel" aria-label="Chat da Twitch">
+              <div class="panel-heading">
+                <h3>Chat oficial</h3>
+                <span>Twitch</span>
+              </div>
+              <iframe
+                id="chatFrame"
+                title="Chat da Twitch"
+                sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals">
+              </iframe>
+            </section>
           </aside>
         </div>
       </section>
 
-      <section class="stats-section" id="stats">
-        <article class="metric-card">
-          <span>Status</span>
-          <strong id="statusMetric">Embed</strong>
-          <small id="statusDetail">Player oficial carregado</small>
-        </article>
-        <article class="metric-card">
-          <span>Viewers ao vivo</span>
-          <strong id="viewersMetric">API</strong>
-          <small id="viewersDetail">Backend busca automaticamente</small>
-        </article>
-        <article class="metric-card">
-          <span>Seguidores</span>
-          <strong id="followersMetric">API</strong>
-          <small id="followersDetail">Backend busca automaticamente</small>
-        </article>
-        <article class="metric-card">
-          <span>Categoria</span>
-          <strong id="gameMetric">Twitch</strong>
-          <small id="gameDetail">Dados oficiais da live</small>
-        </article>
+      <section class="streamers-section" id="streamers">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Sua lista</p>
+            <h2>Canais e favoritos</h2>
+          </div>
+          <form class="add-streamer-form" id="addStreamerForm">
+            <input id="newStreamerInput" type="text" placeholder="login do canal" aria-label="Adicionar canal" />
+            <button type="submit">Adicionar</button>
+          </form>
+        </div>
+
+        <div class="favorites-strip" id="favoritesStrip"></div>
+        <div class="streamer-grid" id="streamerGrid"></div>
       </section>
 
-      <section class="api-section" id="api">
-        <div>
-          <p class="eyebrow">Para todos verem</p>
-          <h2>Publicar online</h2>
+      <section class="multi-section" id="multi">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Assistir junto</p>
+            <h2>Multi stream + multi chat</h2>
+          </div>
+          <p>Escolha ate 4 canais. Players iniciam mutados para voce controlar o audio.</p>
+        </div>
+
+        <div class="multi-controls">
+          <div class="multi-selector" id="multiSelector"></div>
+          <div class="layout-controls" aria-label="Quantidade de telas">
+            <button type="button" data-layout="2">2 telas</button>
+            <button type="button" data-layout="3">3 telas</button>
+            <button class="active" type="button" data-layout="4">4 telas</button>
+          </div>
+        </div>
+
+        <div class="multi-workspace">
+          <section class="multi-card">
+            <div class="panel-heading">
+              <h3>Players</h3>
+              <span id="multiPlayerHint">4 lives carregadas</span>
+            </div>
+            <div class="multi-player-grid four" id="multiPlayerGrid"></div>
+          </section>
+
+          <section class="multi-card">
+            <div class="panel-heading">
+              <h3>Multi chat</h3>
+              <span>Chats oficiais</span>
+            </div>
+            <div class="multi-chat-grid" id="multiChatGrid"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="emotes-section" id="emotes">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">BTTV</p>
+            <h2>Emotes da comunidade</h2>
+          </div>
+          <form class="emote-filter" id="emoteFilterForm">
+            <input id="emoteSearchInput" type="text" placeholder="buscar emote" aria-label="Buscar emote" />
+          </form>
+        </div>
+        <div class="emote-tabs">
+          <button class="active" type="button" data-emote-tab="channel">Canal atual</button>
+          <button type="button" data-emote-tab="global">Globais</button>
+        </div>
+        <div class="emote-grid" id="emoteGrid"></div>
+        <p class="emote-note">
+          BTTV aparece aqui como galeria. O chat oficial da Twitch fica isolado em iframe, entao o site nao consegue alterar as mensagens desse chat por fora.
+        </p>
+      </section>
+
+      <section class="money-section" id="money">
+        <div class="money-copy">
+          <p class="eyebrow">Ganhar com acessos</p>
+          <h2>Monetizacao do hub</h2>
           <p>
-            Hospede este projeto como app Node.js. O backend usa variaveis privadas para conversar com a Twitch e o frontend mostra os dados para todos.
+            Monetize o seu site fora do iframe da Twitch: apoio, assinatura VIP, patrocinio, afiliados e anuncios quando tiver trafego.
+          </p>
+          <a class="primary-link" id="supportLink" href="#" target="_blank" rel="noreferrer">Adicionar link de apoio</a>
+        </div>
+        <div class="money-grid" id="moneyGrid"></div>
+      </section>
+
+      <section class="edit-section" id="edit">
+        <div>
+          <p class="eyebrow">Editar depois</p>
+          <h2>Mude tudo em um arquivo</h2>
+          <p>
+            Nome do site, streamers iniciais, textos e link de pagamento ficam em <code>site-config.js</code>. Favoritos e canais adicionados por usuarios ficam salvos no navegador deles.
           </p>
         </div>
-        <div class="deploy-card">
-          <strong>Variaveis no servidor</strong>
-          <code>TWITCH_CLIENT_ID</code>
-          <code>TWITCH_CLIENT_SECRET</code>
-          <code>TWITCH_USER_ACCESS_TOKEN</code>
+        <div class="status-card">
+          <strong>Status da API</strong>
           <small id="apiMessage">Verificando conexao com a Twitch API...</small>
         </div>
       </section>
     </main>
 
+    <script src="site-config.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

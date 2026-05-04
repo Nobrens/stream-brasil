@@ -39,7 +39,9 @@ Veja o passo a passo em `DEPLOY.md`.
 
 ## Streamers no site
 
-Edite a lista `streamers` em `app.js`.
+Edite a lista `streamers` em `site-config.js`. Veja `COMO-MUDAR-O-SITE.md`.
+
+Visitantes tambem podem adicionar streamers e favoritar canais pelo proprio site. Esses dados ficam no navegador da pessoa.
 
 O backend busca dados para todos os streamers que estao nessa lista chamando:
 
