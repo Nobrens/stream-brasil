@@ -49,10 +49,39 @@ const types = {
   ".svg": "image/svg+xml",
 };
 
+const publicExtensions = new Set([".html", ".css", ".js", ".png", ".jpg", ".jpeg", ".svg"]);
+const publicFiles = new Set(["index.html", "styles.css", "app.js", "site-config.js"]);
+const assetsRoot = path.join(root, "assets");
+const statsCache = new Map();
+const statsCacheMs = 30_000;
+
+const securityHeaders = {
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+  "Content-Security-Policy": [
+    "default-src 'self'",
+    "script-src 'self' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.google.com https://*.gstatic.com",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https://cdn.betterttv.net https://static-cdn.jtvnw.net https://*.googleusercontent.com https://*.gstatic.com https://*.googlesyndication.com",
+    "connect-src 'self' https://api.betterttv.net https://cdn.betterttv.net https://*.google.com https://*.googlesyndication.com",
+    "frame-src https://player.twitch.tv https://www.twitch.tv https://*.google.com https://*.googlesyndication.com https://*.doubleclick.net",
+    "frame-ancestors 'self'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join("; "),
+};
+
+function withSecurityHeaders(headers = {}) {
+  return { ...securityHeaders, ...headers };
+}
+
 function sendJson(response, status, payload) {
   response.writeHead(status, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
+    ...withSecurityHeaders({
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+    }),
   });
   response.end(JSON.stringify(payload));
 }
@@ -155,6 +184,14 @@ async function handleTwitchStats(request, response) {
     return;
   }
 
+  const cacheKey = channels.slice().sort().join(",");
+  const cached = statsCache.get(cacheKey);
+
+  if (cached && cached.expiresAt > Date.now()) {
+    sendJson(response, 200, cached.payload);
+    return;
+  }
+
   try {
     const tokenData = await getAppAccessToken();
     const userPayload = await twitchGet(`users?${buildRepeatedQuery("login", channels)}`, tokenData);
@@ -196,11 +233,17 @@ async function handleTwitchStats(request, response) {
       };
     });
 
-    sendJson(response, 200, {
+    const payload = {
       configured: true,
       generatedAt: new Date().toISOString(),
       channels: data,
+    };
+
+    statsCache.set(cacheKey, {
+      expiresAt: Date.now() + statsCacheMs,
+      payload,
     });
+    sendJson(response, 200, payload);
   } catch (error) {
     const missingEnv = error.message === "missing_twitch_env";
     sendJson(response, missingEnv ? 200 : 500, {
@@ -214,28 +257,41 @@ async function handleTwitchStats(request, response) {
 }
 
 function serveStatic(request, response) {
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    response.writeHead(405, withSecurityHeaders({ Allow: "GET, HEAD" }));
+    response.end("Method not allowed");
+    return;
+  }
+
   const url = new URL(request.url, `http://${request.headers.host}`);
   const pathname = decodeURIComponent(url.pathname);
   const filePath = path.normalize(path.join(root, pathname === "/" ? "index.html" : pathname));
   const insideRoot = filePath === root || filePath.startsWith(`${root}${path.sep}`);
+  const basename = path.basename(filePath);
+  const extension = path.extname(filePath).toLowerCase();
+  const isRootPublicFile = path.dirname(filePath) === root && publicFiles.has(basename);
+  const isAssetFile = filePath.startsWith(`${assetsRoot}${path.sep}`) && publicExtensions.has(extension);
 
-  if (!insideRoot) {
-    response.writeHead(403);
+  if (!insideRoot || basename.startsWith(".") || (!isRootPublicFile && !isAssetFile)) {
+    response.writeHead(403, withSecurityHeaders());
     response.end("Forbidden");
     return;
   }
 
   fs.readFile(filePath, (error, content) => {
     if (error) {
-      response.writeHead(404);
+      response.writeHead(404, withSecurityHeaders());
       response.end("Not found");
       return;
     }
 
     response.writeHead(200, {
-      "Content-Type": types[path.extname(filePath).toLowerCase()] || "application/octet-stream",
+      ...withSecurityHeaders({
+        "Content-Type": types[extension] || "application/octet-stream",
+        "Cache-Control": extension === ".html" ? "no-store" : "public, max-age=3600",
+      }),
     });
-    response.end(content);
+    response.end(request.method === "HEAD" ? undefined : content);
   });
 }
 
@@ -251,17 +307,23 @@ const server = http.createServer((request, response) => {
     const publisherId = process.env.ADSENSE_PUBLISHER_ID || "";
 
     if (!/^pub-\d+$/.test(publisherId)) {
-      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      response.writeHead(404, withSecurityHeaders({ "Content-Type": "text/plain; charset=utf-8" }));
       response.end("ads.txt not configured");
       return;
     }
 
-    response.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+    response.writeHead(200, withSecurityHeaders({ "Content-Type": "text/plain; charset=utf-8" }));
     response.end(`google.com, ${publisherId}, DIRECT, f08c47fec0942fa0\n`);
     return;
   }
 
   if (url.pathname === "/api/twitch/stats") {
+    if (request.method !== "GET" && request.method !== "HEAD") {
+      response.writeHead(405, withSecurityHeaders({ Allow: "GET, HEAD" }));
+      response.end("Method not allowed");
+      return;
+    }
+
     handleTwitchStats(request, response);
     return;
   }

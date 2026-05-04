@@ -82,6 +82,25 @@ function writeJson(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
 
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  })[char]);
+}
+
+function safeExternalUrl(value) {
+  try {
+    const url = new URL(String(value || ""), window.location.href);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "#";
+  } catch {
+    return "#";
+  }
+}
+
 function normalizeLogin(login) {
   return String(login || "")
     .trim()
@@ -148,10 +167,10 @@ function setBrandContent() {
   els.heroSubtitle.textContent = config.heroSubtitle || "Assista varios streamers brasileiros ao mesmo tempo.";
 
   if (config.supportLink && config.supportLink !== "https://buy.stripe.com/") {
-    els.supportLink.href = config.supportLink;
+    els.supportLink.href = safeExternalUrl(config.supportLink);
     els.supportLink.textContent = "Apoiar projeto";
   } else {
-    els.supportLink.href = "#edit";
+    els.supportLink.href = "#";
     els.supportLink.textContent = "Adicionar link de apoio";
   }
 }
@@ -160,7 +179,7 @@ function renderAdsense() {
   const adsense = config.adsense || {};
   const client = adsense.client || "";
   const slots = adsense.slots || {};
-  const enabled = Boolean(adsense.enabled && client.startsWith("ca-pub-"));
+  const enabled = Boolean(adsense.enabled && /^ca-pub-\d+$/.test(client));
 
   if (!enabled) return;
 
@@ -172,14 +191,14 @@ function renderAdsense() {
 
   document.querySelectorAll("[data-ad-slot-name]").forEach((container) => {
     const slot = slots[container.dataset.adSlotName];
-    if (!slot) return;
+    if (!/^\d+$/.test(String(slot || ""))) return;
 
     container.classList.add("active");
     container.innerHTML = `
       <ins class="adsbygoogle"
         style="display:block"
-        data-ad-client="${client}"
-        data-ad-slot="${slot}"
+        data-ad-client="${escapeHtml(client)}"
+        data-ad-slot="${escapeHtml(slot)}"
         data-ad-format="auto"
         data-full-width-responsive="true"></ins>
     `;
@@ -202,7 +221,7 @@ function renderFavorites() {
   }
 
   els.favoritesStrip.innerHTML = favoriteStreamers
-    .map((streamer) => `<button class="favorite-chip" type="button" data-favorite-watch="${streamer.login}">${streamer.name}</button>`)
+    .map((streamer) => `<button class="favorite-chip" type="button" data-favorite-watch="${escapeHtml(streamer.login)}">${escapeHtml(streamer.name)}</button>`)
     .join("");
 
   els.favoritesStrip.querySelectorAll("[data-favorite-watch]").forEach((button) => {
@@ -225,19 +244,19 @@ function renderStreamers() {
         <article class="streamer-card ${streamer.login === activeChannel ? "active" : ""} ${isFavorite ? "favorite" : ""}">
           <div>
             <p>${streamer.custom ? "Adicionado por voce" : "Twitch / Brasil"}</p>
-            <strong>${streamer.name}</strong>
-            <p>${stats?.gameName || streamer.category}</p>
+            <strong>${escapeHtml(streamer.name)}</strong>
+            <p>${escapeHtml(stats?.gameName || streamer.category)}</p>
           </div>
           <div>
-            <p>${liveText}</p>
-            <p>${followerText}</p>
+            <p>${escapeHtml(liveText)}</p>
+            <p>${escapeHtml(followerText)}</p>
           </div>
           <div class="card-actions">
-            <button type="button" data-watch="${streamer.login}">Assistir</button>
-            <button class="${selected ? "selected" : ""}" type="button" data-multi="${streamer.login}">
+            <button type="button" data-watch="${escapeHtml(streamer.login)}">Assistir</button>
+            <button class="${selected ? "selected" : ""}" type="button" data-multi="${escapeHtml(streamer.login)}">
               ${selected ? "No multi" : "Multi"}
             </button>
-            <button class="${isFavorite ? "selected" : ""}" type="button" data-favorite="${streamer.login}">
+            <button class="${isFavorite ? "selected" : ""}" type="button" data-favorite="${escapeHtml(streamer.login)}">
               ${isFavorite ? "Favorito" : "Favoritar"}
             </button>
           </div>
@@ -297,8 +316,8 @@ function addCustomStreamer(login) {
 function renderMultiSelector() {
   els.multiSelector.innerHTML = streamers
     .map((streamer) => `
-      <button class="${selectedMulti.includes(streamer.login) ? "active" : ""}" type="button" data-channel="${streamer.login}">
-        ${streamer.name}
+      <button class="${selectedMulti.includes(streamer.login) ? "active" : ""}" type="button" data-channel="${escapeHtml(streamer.login)}">
+        ${escapeHtml(streamer.name)}
       </button>
     `)
     .join("");
@@ -354,10 +373,10 @@ function renderMultiEmbeds() {
     .map((channel) => `
       <article class="multi-frame">
         <div class="mini-title">
-          <strong>${getStreamerLabel(channel)}</strong>
+          <strong>${escapeHtml(getStreamerLabel(channel))}</strong>
           <span>${statsByLogin.get(channel)?.isLive ? "Ao vivo" : "Twitch"}</span>
         </div>
-        <iframe title="Player ${getStreamerLabel(channel)}" src="${buildPlayerSrc(channel)}" allowfullscreen></iframe>
+        <iframe title="Player ${escapeHtml(getStreamerLabel(channel))}" src="${escapeHtml(buildPlayerSrc(channel))}" allowfullscreen></iframe>
       </article>
     `)
     .join("");
@@ -366,12 +385,12 @@ function renderMultiEmbeds() {
     .map((channel) => `
       <article class="chat-frame">
         <div class="mini-title">
-          <strong>${getStreamerLabel(channel)}</strong>
+          <strong>${escapeHtml(getStreamerLabel(channel))}</strong>
           <span>Chat</span>
         </div>
         <iframe
-          title="Chat ${getStreamerLabel(channel)}"
-          src="${buildChatSrc(channel)}"
+          title="Chat ${escapeHtml(getStreamerLabel(channel))}"
+          src="${escapeHtml(buildChatSrc(channel))}"
           sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals">
         </iframe>
       </article>
@@ -513,9 +532,9 @@ async function renderEmotes() {
 
     els.emoteGrid.innerHTML = filtered
       .map((emote) => `
-        <article class="emote-card" title="${emote.source}">
-          <img src="${emote.imageUrl}" alt="${emote.code}" loading="lazy" />
-          <strong>${emote.code}</strong>
+        <article class="emote-card" title="${escapeHtml(emote.source)}">
+          <img src="${escapeHtml(emote.imageUrl)}" alt="${escapeHtml(emote.code)}" loading="lazy" />
+          <strong>${escapeHtml(emote.code)}</strong>
         </article>
       `)
       .join("");
@@ -531,8 +550,8 @@ function renderMoneyCards() {
   els.moneyGrid.innerHTML = cards
     .map((card) => `
       <article class="money-card">
-        <strong>${card.title}</strong>
-        <p>${card.text}</p>
+        <strong>${escapeHtml(card.title)}</strong>
+        <p>${escapeHtml(card.text)}</p>
       </article>
     `)
     .join("");
