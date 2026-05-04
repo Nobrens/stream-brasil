@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin - Stream Brasil</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-mark">SB</span>
+        <span>Admin</span>
+      </a>
+      <nav class="nav-tabs">
+        <a class="tab-button active" href="/">Voltar ao site</a>
+      </nav>
+    </header>
+
+    <main class="app-main">
+      <section class="tab-panel active">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Painel privado</p>
+            <h2>Controle do hub</h2>
+          </div>
+          <form class="channel-form" id="tokenForm">
+            <input id="tokenInput" type="password" placeholder="ADMIN_TOKEN do Render" autocomplete="off" />
+            <button type="submit">Entrar</button>
+          </form>
+        </div>
+
+        <div class="support-layout">
+          <form class="status-card" id="siteDataForm">
+            <strong>Dados globais</strong>
+            <label>
+              Link de apoio
+              <input id="supportLinkInput" type="url" placeholder="https://..." />
+            </label>
+            <label>
+              Texto patrocinador
+              <input id="sponsorTextInput" type="text" maxlength="220" />
+            </label>
+            <label>
+              Streamers globais
+              <textarea id="streamersInput" rows="8" placeholder="gaules|Gaules|Counter-Strike 2"></textarea>
+            </label>
+            <label>
+              Presets multi stream
+              <textarea id="presetsInput" rows="7" placeholder="CS BR: gaules,loud_coringa"></textarea>
+            </label>
+            <button class="primary-link" type="submit">Salvar configuracao</button>
+            <small id="adminMessage">Entre com o token para carregar.</small>
+          </form>
+
+          <section class="status-card">
+            <strong>Analytics simples</strong>
+            <pre id="analyticsOutput">Entre com o token para ver.</pre>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="admin.js"></script>
+  </body>
+</html>
