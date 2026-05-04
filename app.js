@@ -39,6 +39,7 @@ const els = {
   gameMetric: document.querySelector("#gameMetric"),
   gameDetail: document.querySelector("#gameDetail"),
   multiSelector: document.querySelector("#multiSelector"),
+  presetStrip: document.querySelector("#presetStrip"),
   multiPlayerGrid: document.querySelector("#multiPlayerGrid"),
   multiChatGrid: document.querySelector("#multiChatGrid"),
   multiPlayerHint: document.querySelector("#multiPlayerHint"),
@@ -48,6 +49,7 @@ const els = {
   emoteSearchInput: document.querySelector("#emoteSearchInput"),
   moneyGrid: document.querySelector("#moneyGrid"),
   supportLink: document.querySelector("#supportLink"),
+  sponsorText: document.querySelector("#sponsorText"),
   apiMessage: document.querySelector("#apiMessage"),
   homeApiLabel: document.querySelector("#homeApiLabel"),
 };
@@ -57,7 +59,8 @@ const compact = new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFra
 let customStreamers = readJson(storageKeys.customStreamers, []);
 let favorites = readJson(storageKeys.favorites, []);
 let streamers = mergeStreamers(baseStreamers, customStreamers);
-let activeChannel = streamers[0]?.login || "gaules";
+let siteData = { featuredPresets: [], streamers: [], supportLink: "", sponsorText: "" };
+let activeChannel = normalizeLogin(window.STREAM_BRASIL_INITIAL_CHANNEL) || streamers[0]?.login || "gaules";
 let apiConfigured = false;
 let statsByLogin = new Map();
 let multiLimit = 4;
@@ -172,6 +175,50 @@ function setBrandContent() {
   } else {
     els.supportLink.href = "#";
     els.supportLink.textContent = "Adicionar link de apoio";
+  }
+}
+
+async function loadSiteData() {
+  try {
+    const response = await fetch("/api/site-data");
+    const payload = await response.json();
+    siteData = payload.data || siteData;
+
+    streamers = mergeStreamers(baseStreamers, [...(siteData.streamers || []), ...customStreamers]);
+    selectedMulti = selectedMulti.filter((channel) => streamers.some((streamer) => streamer.login === channel));
+
+    if (!selectedMulti.length) {
+      selectedMulti = streamers.slice(0, 4).map((streamer) => streamer.login);
+    }
+
+    if (siteData.supportLink) {
+      els.supportLink.href = safeExternalUrl(siteData.supportLink);
+      els.supportLink.textContent = "Apoiar projeto";
+    }
+
+    if (siteData.sponsorText) {
+      els.sponsorText.textContent = siteData.sponsorText;
+    }
+
+    renderStreamers();
+    renderMultiSelector();
+    renderPresetStrip();
+    renderMultiEmbeds();
+  } catch {
+    renderPresetStrip();
+  }
+}
+
+function trackEvent(type, channel = activeChannel) {
+  try {
+    fetch("/api/analytics", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type, channel }),
+      keepalive: true,
+    });
+  } catch {
+    // Analytics is best-effort only.
   }
 }
 
@@ -324,6 +371,34 @@ function renderMultiSelector() {
 
   els.multiSelector.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", () => toggleMultiChannel(button.dataset.channel));
+  });
+}
+
+function renderPresetStrip() {
+  const presets = siteData.featuredPresets || [];
+
+  if (!presets.length) {
+    els.presetStrip.innerHTML = "";
+    return;
+  }
+
+  els.presetStrip.innerHTML = presets
+    .map((preset, index) => `<button class="preset-chip" type="button" data-preset-index="${index}">${escapeHtml(preset.name)}</button>`)
+    .join("");
+
+  els.presetStrip.querySelectorAll("[data-preset-index]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const preset = presets[Number(button.dataset.presetIndex)];
+      selectedMulti = (preset.channels || []).filter((channel) => streamers.some((streamer) => streamer.login === channel)).slice(0, 4);
+
+      if (!selectedMulti.length) return;
+
+      renderStreamers();
+      renderMultiSelector();
+      renderMultiEmbeds();
+      openTab("multi");
+      trackEvent("preset_open", selectedMulti[0]);
+    });
   });
 }
 
@@ -590,6 +665,7 @@ function loadChannel(channel) {
   renderEmbeds(activeChannel);
   renderSelectedStats(activeChannel);
   renderEmotes();
+  trackEvent("channel_open", activeChannel);
 }
 
 els.channelForm.addEventListener("submit", (event) => {
@@ -641,5 +717,13 @@ renderStreamers();
 renderMultiSelector();
 loadChannel(activeChannel);
 renderMultiEmbeds();
-fetchAllStats();
+renderPresetStrip();
+loadSiteData().then(fetchAllStats);
+trackEvent("page_view", activeChannel);
 setInterval(fetchAllStats, 60_000);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}
