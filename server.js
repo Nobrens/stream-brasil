@@ -247,6 +247,20 @@ const server = http.createServer((request, response) => {
     return;
   }
 
+  if (url.pathname === "/ads.txt") {
+    const publisherId = process.env.ADSENSE_PUBLISHER_ID || "";
+
+    if (!/^pub-\d+$/.test(publisherId)) {
+      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      response.end("ads.txt not configured");
+      return;
+    }
+
+    response.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+    response.end(`google.com, ${publisherId}, DIRECT, f08c47fec0942fa0\n`);
+    return;
+  }
+
   if (url.pathname === "/api/twitch/stats") {
     handleTwitchStats(request, response);
     return;

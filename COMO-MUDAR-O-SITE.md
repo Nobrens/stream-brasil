@@ -57,6 +57,8 @@ Crie um link de pagamento no Stripe, Mercado Pago, Apoia.se ou outro servico e c
 supportLink: "https://seu-link-de-pagamento.com",
 ```
 
+Para AdSense, veja `COMO-COLOCAR-ADS-E-APOIO.md`.
+
 ## Mudar ideias de monetizacao
 
 Edite:

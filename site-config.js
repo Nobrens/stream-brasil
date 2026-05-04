@@ -4,6 +4,14 @@ window.STREAM_BRASIL_CONFIG = {
   heroTitle: "Multi Stream BR",
   heroSubtitle: "Assista varios streamers brasileiros ao mesmo tempo com player real, chat oficial e dados ao vivo da Twitch.",
   supportLink: "https://buy.stripe.com/",
+  adsense: {
+    enabled: false,
+    client: "ca-pub-4344183847710369",
+    slots: {
+      homeTop: "",
+      support: "",
+    },
+  },
   streamers: [
     { login: "gaules", name: "Gaules", category: "Counter-Strike 2" },
     { login: "alanzoka", name: "Alanzoka", category: "Variedades" },

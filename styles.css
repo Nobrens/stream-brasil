@@ -1,17 +1,17 @@
 :root {
   color-scheme: dark;
-  --bg: #06070a;
-  --ink: #f8fbff;
-  --muted: #9da8bb;
-  --line: rgba(255, 255, 255, 0.12);
-  --panel: rgba(255, 255, 255, 0.07);
-  --panel-strong: rgba(255, 255, 255, 0.12);
+  --bg: #05060a;
+  --ink: #f7fbff;
+  --muted: #a4afc2;
+  --soft: rgba(255, 255, 255, 0.07);
+  --soft-2: rgba(255, 255, 255, 0.12);
+  --line: rgba(255, 255, 255, 0.13);
   --green: #37f28d;
-  --cyan: #34d4ff;
+  --cyan: #32d8ff;
   --violet: #8b5cf6;
-  --yellow: #f7d95c;
+  --yellow: #f6da5b;
   --red: #ff4d68;
-  --shadow: 0 26px 80px rgba(0, 0, 0, 0.44);
+  --shadow: 0 28px 90px rgba(0, 0, 0, 0.44);
 }
 
 * {
@@ -25,25 +25,25 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 8% 2%, rgba(55, 242, 141, 0.2), transparent 25rem),
-    radial-gradient(circle at 88% 5%, rgba(52, 212, 255, 0.16), transparent 27rem),
-    radial-gradient(circle at 48% 32%, rgba(139, 92, 246, 0.11), transparent 31rem),
-    linear-gradient(135deg, #06070a 0%, #0e111a 52%, #07080d 100%);
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 16% 6%, rgba(55, 242, 141, 0.24), transparent 24rem),
+    radial-gradient(circle at 82% 0%, rgba(50, 216, 255, 0.18), transparent 29rem),
+    radial-gradient(circle at 52% 48%, rgba(139, 92, 246, 0.16), transparent 33rem),
+    linear-gradient(135deg, #05060a 0%, #0c1020 54%, #06070d 100%);
 }
 
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  pointer-events: none;
-  background-image:
+  z-index: -1;
+  background:
     linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: linear-gradient(to bottom, black, transparent 70%);
+    linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(to bottom, black, transparent 80%);
 }
 
 button,
@@ -59,27 +59,39 @@ a {
   color: inherit;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .site-header {
   position: sticky;
   top: 0;
-  z-index: 30;
-  min-height: 4.5rem;
-  padding: 0.85rem clamp(1rem, 3vw, 2rem);
-  display: flex;
+  z-index: 40;
+  min-height: 4.6rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: 1rem;
+  padding: 0.8rem clamp(1rem, 3vw, 2rem);
   border-bottom: 1px solid var(--line);
-  background: rgba(6, 7, 10, 0.82);
+  background: rgba(5, 6, 10, 0.82);
   backdrop-filter: blur(18px);
 }
 
 .brand,
-.nav-links,
+.nav-tabs,
 .hero-actions,
 .card-actions,
-.layout-controls,
 .multi-selector,
+.layout-controls,
 .emote-tabs {
   display: flex;
   align-items: center;
@@ -102,19 +114,13 @@ a {
   color: #03100a;
 }
 
-.nav-links {
-  gap: clamp(0.7rem, 3vw, 1.55rem);
+.nav-tabs {
+  justify-content: flex-end;
+  gap: 0.45rem;
+  overflow-x: auto;
 }
 
-.nav-links a {
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 850;
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
-.header-button,
+.tab-button,
 .primary-link,
 .secondary-link,
 .channel-form button,
@@ -123,55 +129,53 @@ a {
 .multi-selector button,
 .layout-controls button,
 .emote-tabs button {
-  min-height: 2.75rem;
-  border: 1px solid transparent;
+  min-height: 2.55rem;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 0 1rem;
-  background: var(--green);
-  color: #04100a;
-  font-weight: 900;
+  padding: 0 0.85rem;
+  background: rgba(255, 255, 255, 0.065);
+  color: var(--ink);
+  font-weight: 850;
   text-decoration: none;
 }
 
-.secondary-link,
-.streamer-card button,
-.multi-selector button,
-.layout-controls button,
-.emote-tabs button {
-  border-color: var(--line);
-  background: rgba(255, 255, 255, 0.065);
-  color: var(--ink);
-}
-
-.streamer-card button.selected,
+.tab-button.active,
+.primary-link,
 .multi-selector button.active,
 .layout-controls button.active,
-.emote-tabs button.active {
-  border-color: rgba(55, 242, 141, 0.72);
-  background: rgba(55, 242, 141, 0.16);
+.emote-tabs button.active,
+.streamer-card button.selected {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #03100a;
 }
 
-.hero,
-.live-section,
-.streamers-section,
-.multi-section,
-.emotes-section,
-.money-section,
-.edit-section {
-  position: relative;
-  padding: clamp(1rem, 3vw, 2.5rem);
+.app-main {
+  width: min(100%, 1580px);
+  margin: 0 auto;
+  padding: clamp(0.85rem, 2vw, 1.5rem);
 }
 
-.hero {
-  min-height: calc(100vh - 4.5rem);
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.home-hero {
+  min-height: calc(100vh - 7rem);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 30rem);
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 28rem);
   gap: 1rem;
   align-items: center;
 }
 
 .hero-copy {
-  max-width: 66rem;
+  position: relative;
+  z-index: 1;
+  max-width: 62rem;
 }
 
 .eyebrow {
@@ -193,15 +197,15 @@ p {
 h1 {
   margin-bottom: 1rem;
   max-width: 12ch;
-  font-size: clamp(3.4rem, 12vw, 10rem);
+  font-size: clamp(3.8rem, 12vw, 10rem);
   line-height: 0.84;
   text-transform: uppercase;
 }
 
 h2 {
   margin-bottom: 0;
-  font-size: clamp(1.8rem, 4.2vw, 4.1rem);
-  line-height: 0.95;
+  font-size: clamp(1.8rem, 4vw, 4.1rem);
+  line-height: 0.96;
   text-transform: uppercase;
 }
 
@@ -213,9 +217,7 @@ h3 {
 
 .hero-copy p,
 .section-heading p,
-.money-copy p,
-.edit-section p,
-.emote-note {
+.support-copy p {
   max-width: 46rem;
   color: var(--muted);
   line-height: 1.62;
@@ -230,82 +232,133 @@ h3 {
   gap: 0.7rem;
 }
 
-.command-panel,
-.watch-player,
-.watch-side,
-.chat-panel,
-.streamer-card,
-.metric-card,
-.multi-card,
-.money-section,
-.money-card,
-.edit-section,
-.status-card,
-.emotes-section {
+.hero-art {
+  position: absolute;
+  inset: 4.6rem 0 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  width: 22rem;
+  height: 22rem;
+  border-radius: 50%;
+  filter: blur(35px);
+  opacity: 0.36;
+}
+
+.orb-one {
+  left: 46%;
+  top: 11%;
+  background: var(--green);
+}
+
+.orb-two {
+  right: 8%;
+  bottom: 9%;
+  background: var(--violet);
+}
+
+.screen-stack {
+  position: absolute;
+  right: 10%;
+  top: 14%;
+  width: min(38vw, 34rem);
+  display: grid;
+  gap: 0.75rem;
+  transform: rotate(-6deg);
+}
+
+.screen-stack span {
+  display: block;
+  height: 10rem;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--panel);
+  background:
+    linear-gradient(135deg, rgba(55, 242, 141, 0.22), transparent),
+    linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02));
+  box-shadow: var(--shadow);
+}
+
+.hero-status,
+.home-card,
+.watch-player,
+.watch-sidebar,
+.chat-card,
+.metric-card,
+.streamer-card,
+.multi-card,
+.support-layout,
+.money-card,
+.emote-card,
+.ad-slot {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
 }
 
-.command-panel {
+.hero-status {
+  position: relative;
+  z-index: 1;
   overflow: hidden;
 }
 
-.command-top {
+.hero-status div {
+  min-height: 9rem;
   padding: 1.1rem;
-  min-height: 8rem;
   display: grid;
   align-content: space-between;
-  background:
-    radial-gradient(circle at top right, rgba(55, 242, 141, 0.25), transparent 16rem),
-    rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid var(--line);
 }
 
-.command-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.command-grid div {
-  min-height: 7rem;
-  padding: 1rem;
-  display: grid;
-  align-content: space-between;
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-
-.command-grid div:nth-child(2n) {
-  border-right: 0;
-}
-
-.command-grid div:nth-last-child(-n + 2) {
+.hero-status div:last-child {
   border-bottom: 0;
 }
 
-.command-panel span,
+.hero-status span,
+.home-card span,
+.home-card small,
 .metric-card span,
 .metric-card small,
 .streamer-card p,
 .panel-heading span,
 .mini-title span,
 .money-card p,
-.status-card small,
-.emote-note {
+.emote-card strong {
   color: var(--muted);
 }
 
-.command-panel strong {
-  font-size: clamp(1.5rem, 3vw, 2.35rem);
+.hero-status strong {
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
   line-height: 1;
   overflow-wrap: anywhere;
 }
 
-.section-heading,
-.live-toolbar {
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: -4rem;
+  position: relative;
+  z-index: 2;
+}
+
+.home-card {
+  min-height: 8rem;
+  padding: 1rem;
+  display: grid;
+  align-content: space-between;
+}
+
+.home-card strong {
+  font-size: 2.1rem;
+  line-height: 1;
+}
+
+.section-heading {
   display: flex;
   justify-content: space-between;
   align-items: end;
@@ -332,11 +385,10 @@ h3 {
   padding: 0 0.85rem;
 }
 
-.watch-grid {
+.watch-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(21rem, 0.38fr);
   gap: 0.85rem;
-  align-items: stretch;
 }
 
 .watch-player {
@@ -351,21 +403,21 @@ h3 {
   border: 0;
 }
 
-.watch-side {
+.watch-sidebar {
   padding: 0.75rem;
   display: grid;
   grid-template-rows: auto minmax(22rem, 1fr);
   gap: 0.75rem;
 }
 
-.stats-stack {
+.stats-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
 }
 
 .metric-card {
-  min-height: 7.5rem;
+  min-height: 7.4rem;
   padding: 0.85rem;
   display: grid;
   align-content: space-between;
@@ -373,18 +425,17 @@ h3 {
 }
 
 .metric-card strong {
-  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-size: clamp(1.18rem, 3vw, 2rem);
   line-height: 1;
   overflow-wrap: anywhere;
 }
 
-.chat-panel {
+.chat-card,
+.multi-card {
   overflow: hidden;
-  display: grid;
-  grid-template-rows: auto minmax(22rem, 1fr);
 }
 
-.chat-panel iframe {
+.chat-card iframe {
   display: block;
   width: 100%;
   min-height: 24rem;
@@ -401,18 +452,24 @@ h3 {
   gap: 1rem;
 }
 
-.favorites-strip {
-  display: flex;
+.favorites-strip,
+.multi-selector,
+.layout-controls,
+.emote-tabs {
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.favorites-strip {
+  display: flex;
   margin-bottom: 0.85rem;
 }
 
 .favorite-chip {
   min-height: 2.5rem;
-  border: 1px solid rgba(247, 217, 92, 0.55);
+  border: 1px solid rgba(246, 218, 91, 0.55);
   border-radius: 999px;
-  background: rgba(247, 217, 92, 0.11);
+  background: rgba(246, 218, 91, 0.11);
   color: var(--ink);
   padding: 0 0.85rem;
   font-weight: 850;
@@ -420,7 +477,7 @@ h3 {
 
 .streamer-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.85rem;
 }
 
@@ -429,16 +486,15 @@ h3 {
   padding: 1rem;
   display: grid;
   align-content: space-between;
-  overflow: hidden;
 }
 
 .streamer-card.active {
-  border-color: rgba(55, 242, 141, 0.75);
+  border-color: rgba(55, 242, 141, 0.7);
   background: rgba(55, 242, 141, 0.12);
 }
 
 .streamer-card.favorite {
-  border-color: rgba(247, 217, 92, 0.55);
+  border-color: rgba(246, 218, 91, 0.55);
 }
 
 .streamer-card strong {
@@ -454,38 +510,19 @@ h3 {
 .streamer-card button {
   flex: 1;
   min-width: 5.7rem;
-  padding: 0 0.65rem;
 }
 
 .multi-controls {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.85rem;
-  align-items: start;
   margin-bottom: 0.85rem;
 }
 
-.multi-selector,
-.layout-controls,
-.emote-tabs {
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.multi-selector button,
-.layout-controls button,
-.emote-tabs button {
-  min-height: 2.45rem;
-}
-
-.multi-workspace {
+.multi-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.38fr);
   gap: 0.85rem;
-}
-
-.multi-card {
-  overflow: hidden;
 }
 
 .multi-player-grid {
@@ -494,10 +531,7 @@ h3 {
   padding: 0.65rem;
 }
 
-.multi-player-grid.two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
+.multi-player-grid.two,
 .multi-player-grid.three,
 .multi-player-grid.four {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -546,10 +580,6 @@ h3 {
   overflow: auto;
 }
 
-.emotes-section {
-  margin: clamp(1rem, 3vw, 2.5rem);
-}
-
 .emote-tabs {
   margin-bottom: 0.85rem;
 }
@@ -562,9 +592,6 @@ h3 {
 
 .emote-card {
   min-height: 9rem;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.24);
   padding: 0.85rem;
   display: grid;
   place-items: center;
@@ -580,20 +607,15 @@ h3 {
 
 .emote-card strong {
   width: 100%;
-  color: var(--muted);
   font-size: 0.85rem;
   overflow-wrap: anywhere;
 }
 
-.emote-note {
-  margin: 0.85rem 0 0;
-}
-
-.money-section {
-  margin: clamp(1rem, 3vw, 2.5rem);
+.support-layout {
   display: grid;
-  grid-template-columns: minmax(16rem, 0.7fr) minmax(0, 1fr);
+  grid-template-columns: minmax(16rem, 0.65fr) minmax(0, 1fr);
   gap: 1rem;
+  padding: 1rem;
 }
 
 .money-grid {
@@ -613,56 +635,47 @@ h3 {
   font-size: 1.2rem;
 }
 
-.edit-section {
-  margin: clamp(1rem, 3vw, 2.5rem);
-  display: grid;
-  grid-template-columns: minmax(16rem, 1fr) minmax(16rem, 0.55fr);
-  gap: 1rem;
+.ad-slot {
+  display: none;
+  margin-top: 0.85rem;
+  min-height: 6rem;
+  padding: 0.75rem;
+  overflow: hidden;
 }
 
-.edit-section code {
-  color: var(--green);
-}
-
-.status-card {
-  padding: 1rem;
-  display: grid;
-  align-content: space-between;
-  min-height: 8rem;
+.ad-slot.active {
+  display: block;
 }
 
 @media (max-width: 1180px) {
+  .home-grid,
   .streamer-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .watch-grid,
-  .multi-workspace,
-  .money-section,
-  .edit-section {
+  .watch-layout,
+  .multi-layout,
+  .support-layout {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 760px) {
-  .site-header,
-  .section-heading {
-    align-items: stretch;
-    flex-direction: column;
+  .site-header {
+    grid-template-columns: 1fr;
   }
 
-  .nav-links {
-    width: 100%;
-    gap: 0.65rem;
-    overflow-x: auto;
+  .nav-tabs {
+    justify-content: flex-start;
   }
 
-  .hero,
-  .command-grid,
+  .home-hero,
+  .home-grid,
+  .hero-status,
   .streamer-grid,
   .channel-form,
   .add-streamer-form,
-  .stats-stack,
+  .stats-grid,
   .multi-controls,
   .multi-player-grid.two,
   .multi-player-grid.three,
@@ -671,13 +684,21 @@ h3 {
     grid-template-columns: 1fr;
   }
 
-  .hero {
-    min-height: auto;
-    padding-top: 4rem;
+  .section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .home-grid {
+    margin-top: 0;
+  }
+
+  .screen-stack {
+    display: none;
   }
 
   .watch-player iframe,
-  .chat-panel iframe,
+  .chat-card iframe,
   .multi-frame iframe,
   .chat-frame iframe {
     min-height: 20rem;

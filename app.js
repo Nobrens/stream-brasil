@@ -49,6 +49,7 @@ const els = {
   moneyGrid: document.querySelector("#moneyGrid"),
   supportLink: document.querySelector("#supportLink"),
   apiMessage: document.querySelector("#apiMessage"),
+  homeApiLabel: document.querySelector("#homeApiLabel"),
 };
 
 const nf = new Intl.NumberFormat("pt-BR");
@@ -119,6 +120,18 @@ function setApiMessage(message, isError = false) {
   els.apiMessage.style.color = isError ? "var(--red)" : "var(--muted)";
 }
 
+function openTab(tabName) {
+  document.querySelectorAll(".tab-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.tab === tabName);
+  });
+
+  document.querySelectorAll(".tab-panel").forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.panel === tabName);
+  });
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function getStreamer(login) {
   return streamers.find((streamer) => streamer.login === login);
 }
@@ -141,6 +154,42 @@ function setBrandContent() {
     els.supportLink.href = "#edit";
     els.supportLink.textContent = "Adicionar link de apoio";
   }
+}
+
+function renderAdsense() {
+  const adsense = config.adsense || {};
+  const client = adsense.client || "";
+  const slots = adsense.slots || {};
+  const enabled = Boolean(adsense.enabled && client.startsWith("ca-pub-"));
+
+  if (!enabled) return;
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.crossOrigin = "anonymous";
+  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(client)}`;
+  document.head.append(script);
+
+  document.querySelectorAll("[data-ad-slot-name]").forEach((container) => {
+    const slot = slots[container.dataset.adSlotName];
+    if (!slot) return;
+
+    container.classList.add("active");
+    container.innerHTML = `
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="${client}"
+        data-ad-slot="${slot}"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    `;
+
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch {
+      // AdSense may block in local/dev environments.
+    }
+  });
 }
 
 function renderFavorites() {
@@ -349,7 +398,7 @@ function toggleMultiChannel(channel) {
 function renderSelectedStats(channel) {
   const stats = statsByLogin.get(channel);
 
-  if (!apiConfigured) {
+    if (!apiConfigured) {
     els.viewersMetric.textContent = "API";
     els.viewersDetail.textContent = "Configure as variaveis no servidor";
     els.followersMetric.textContent = "API";
@@ -357,6 +406,7 @@ function renderSelectedStats(channel) {
     els.gameMetric.textContent = "Twitch";
     els.gameDetail.textContent = "Player e chat ja funcionam";
     els.heroStatus.textContent = "Falta configurar API no servidor";
+    els.homeApiLabel.textContent = "Offline";
     return;
   }
 
@@ -368,6 +418,7 @@ function renderSelectedStats(channel) {
     els.gameMetric.textContent = "Twitch";
     els.gameDetail.textContent = "Sem dados para este canal";
     els.heroStatus.textContent = "Canal nao encontrado";
+    els.homeApiLabel.textContent = "Twitch";
     return;
   }
 
@@ -378,12 +429,14 @@ function renderSelectedStats(channel) {
     els.gameDetail.textContent = "Categoria oficial";
     els.liveTitle.textContent = stats.title || `${stats.displayName} na Twitch`;
     els.heroStatus.textContent = `${compact.format(stats.viewerCount)} viewers agora`;
+    els.homeApiLabel.textContent = "Online";
   } else {
     els.viewersMetric.textContent = "Offline";
     els.viewersDetail.textContent = "Canal nao esta ao vivo agora";
     els.gameMetric.textContent = stats.gameName || "Offline";
     els.gameDetail.textContent = "Ultima categoria conhecida";
     els.heroStatus.textContent = "Canal offline, chat continua disponivel";
+    els.homeApiLabel.textContent = "Online";
   }
 
   if (stats.followerTotal != null) {
@@ -545,6 +598,14 @@ document.querySelectorAll("[data-layout]").forEach((button) => {
   });
 });
 
+document.querySelectorAll("[data-tab]").forEach((button) => {
+  button.addEventListener("click", () => openTab(button.dataset.tab));
+});
+
+document.querySelectorAll("[data-open-tab]").forEach((button) => {
+  button.addEventListener("click", () => openTab(button.dataset.openTab));
+});
+
 document.querySelectorAll("[data-emote-tab]").forEach((button) => {
   button.addEventListener("click", () => {
     activeEmoteTab = button.dataset.emoteTab;
@@ -555,6 +616,7 @@ document.querySelectorAll("[data-emote-tab]").forEach((button) => {
 });
 
 setBrandContent();
+renderAdsense();
 renderMoneyCards();
 renderStreamers();
 renderMultiSelector();
