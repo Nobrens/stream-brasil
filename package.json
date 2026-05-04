@@ -1,0 +1,13 @@
+{
+  "name": "stream-brasil",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site de streamers brasileiros com player, chat e dados reais da Twitch.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

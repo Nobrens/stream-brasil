@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meta lista</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Meta lista</h1>
+    <p class="subtitulo">Organize seu dia de forma simples e bonita</p>
+
+    <div class="input-area">
+      <input type="text" id="tarefaInput" placeholder="Digite uma tarefa">
+      <button id="adicionarBtn">Adicionar</button>
+    </div>
+
+    <div class="painel-info">
+      <div class="card-info">
+        <span id="totalTarefas">0</span>
+        <p>Total</p>
+      </div>
+
+      <div class="card-info">
+        <span id="tarefasConcluidas">0</span>
+        <p>Concluídas</p>
+      </div>
+    </div>
+
+    <div class="filtros">
+      <button class="filtro-btn ativo" data-filtro="todas">Todas</button>
+      <button class="filtro-btn" data-filtro="pendentes">Pendentes</button>
+      <button class="filtro-btn" data-filtro="concluidas">Concluídas</button>
+    </div>
+
+    <ul id="listaTarefas"></ul>
+
+    <p id="mensagemVazia">Nenhuma tarefa adicionada ainda.</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

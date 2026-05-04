@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stream Brasil - Lives em Tempo Real</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="Stream Brasil">
+        <span class="brand-mark">SB</span>
+        <span>Stream Brasil</span>
+      </a>
+      <nav class="nav-links" aria-label="Navegacao principal">
+        <a href="#streamers">Streamers</a>
+        <a href="#live">Live</a>
+        <a href="#stats">Seguidores</a>
+        <a href="#api">Publicar</a>
+      </nav>
+      <button class="header-button" id="openSettingsButton" type="button">Publicar site</button>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <div class="hero-bg" aria-hidden="true"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Painel brasileiro de lives</p>
+          <h1>Streamers BR ao vivo</h1>
+          <p>
+            Assista transmissao real, acompanhe chat oficial da Twitch e veja dados de viewers, categoria e seguidores pelo backend do site.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-link" href="#live">Abrir live</a>
+            <a class="secondary-link" href="#streamers">Escolher streamer</a>
+          </div>
+        </div>
+        <aside class="hero-card">
+          <span>Canal selecionado</span>
+          <strong id="heroChannel">Gaules</strong>
+          <small id="heroStatus">Player e chat reais via Twitch</small>
+        </aside>
+      </section>
+
+      <section class="streamers-section" id="streamers">
+        <div class="section-heading">
+          <p class="eyebrow">Lineup nacional</p>
+          <h2>Streamers brasileiros</h2>
+        </div>
+        <div class="streamer-grid" id="streamerGrid"></div>
+      </section>
+
+      <section class="live-section" id="live">
+        <div class="live-toolbar">
+          <div>
+            <p class="eyebrow">Live real</p>
+            <h2 id="liveTitle">Gaules na Twitch</h2>
+          </div>
+          <form class="channel-form" id="channelForm">
+            <input id="channelInput" type="text" value="gaules" aria-label="Canal da Twitch" />
+            <button type="submit">Carregar</button>
+          </form>
+        </div>
+
+        <div class="embed-grid">
+          <section class="player-panel" aria-label="Player da Twitch">
+            <div class="embed-shell" id="playerShell">
+              <iframe
+                id="playerFrame"
+                title="Player da Twitch"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </section>
+
+          <aside class="chat-panel" aria-label="Chat da Twitch">
+            <iframe
+              id="chatFrame"
+              title="Chat da Twitch"
+              sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals">
+            </iframe>
+          </aside>
+        </div>
+      </section>
+
+      <section class="stats-section" id="stats">
+        <article class="metric-card">
+          <span>Status</span>
+          <strong id="statusMetric">Embed</strong>
+          <small id="statusDetail">Player oficial carregado</small>
+        </article>
+        <article class="metric-card">
+          <span>Viewers ao vivo</span>
+          <strong id="viewersMetric">API</strong>
+          <small id="viewersDetail">Backend busca automaticamente</small>
+        </article>
+        <article class="metric-card">
+          <span>Seguidores</span>
+          <strong id="followersMetric">API</strong>
+          <small id="followersDetail">Backend busca automaticamente</small>
+        </article>
+        <article class="metric-card">
+          <span>Categoria</span>
+          <strong id="gameMetric">Twitch</strong>
+          <small id="gameDetail">Dados oficiais da live</small>
+        </article>
+      </section>
+
+      <section class="api-section" id="api">
+        <div>
+          <p class="eyebrow">Para todos verem</p>
+          <h2>Publicar online</h2>
+          <p>
+            Hospede este projeto como app Node.js. O backend usa variaveis privadas para conversar com a Twitch e o frontend mostra os dados para todos.
+          </p>
+        </div>
+        <div class="deploy-card">
+          <strong>Variaveis no servidor</strong>
+          <code>TWITCH_CLIENT_ID</code>
+          <code>TWITCH_CLIENT_SECRET</code>
+          <code>TWITCH_USER_ACCESS_TOKEN</code>
+          <small id="apiMessage">Verificando conexao com a Twitch API...</small>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
